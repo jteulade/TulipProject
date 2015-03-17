@@ -64,6 +64,9 @@ class Dendrogram: public tlp::LayoutAlgorithm {
   float   setAllNodesCoordX(tlp::node n, float rightMargin,
                             OrientableLayout *oriLayout,
                             OrientableSizeProxy *oriSize);
+  void   setAllNodesCoordXBis(tlp::node n,
+                            OrientableLayout *oriLayout,
+                            OrientableSizeProxy *oriSize);
   void    setAllNodesCoordY(OrientableLayout *oriLayout,
                             OrientableSizeProxy *oriSize);
   void    setAllNodesCoordYBis(OrientableLayout *oriLayout,

@@ -65,6 +65,7 @@ bool Dendrogram::run() {
   if (!getNodeSizePropertyParameter(dataSet, size))
     size = graph->getProperty<SizeProperty>("viewSize");
 
+
   OrientableSizeProxy oriSize(size, mask);
   getSpacingParameters(dataSet, nodeSpacing, spacing);
 
@@ -99,8 +100,28 @@ bool Dendrogram::run() {
       spacing = minLayerSpacing + nodeSpacing;
   }
 
-  setAllNodesCoordX(root, 0.f, oriLayout, &oriSize);
-  shiftAllNodes(root, 0.f, oriLayout);
+  IntegerProperty *idNode = tree->getProperty<IntegerProperty>("id_node");
+  Iterator<node> *itNode =  tree->getNodes();
+
+
+
+
+
+   while (itNode->hasNext()) {
+        node currentNode   = itNode->next();
+        OrientableCoord coord   =  oriLayout->getNodeValue(currentNode);
+        if (isLeaf(tree, currentNode)) {
+            coord.setX(idNode->getNodeValue(currentNode) * nodeSpacing);
+            oriLayout->setNodeValue(currentNode, coord);
+        } else {
+            float posX = computeFatherXPosition(currentNode, oriLayout);
+            coord.setX(posX);
+            oriLayout->setNodeValue(currentNode, coord);
+        }
+   }
+
+//  setAllNodesCoordXBis(root, 0.f, oriLayout, &oriSize);
+//  shiftAllNodes(root, 0.f, oriLayout);
   setAllNodesCoordYBis(oriLayout, &oriSize);
 
   if (hasOrthogonalEdge(dataSet))
@@ -151,6 +172,26 @@ float Dendrogram::setAllNodesCoordX(tlp::node n, float rightMargin,
   return  leftMargin + leftOverflow + rightOverflow;
 }
 
+//void Dendrogram::setAllNodesCoordXBis(tlp::node n,
+//                                    OrientableLayout *oriLayout, OrientableSizeProxy *oriSize) {
+
+//  Iterator<node>* itNode = tree->getOutNodes(n);
+
+//  while (itNode->hasNext()) {
+//    node currentNode   = itNode->next();
+//    setAllNodesCoordX(currentNode, oriLayout, oriSize);
+//  }
+
+//  delete itNode;
+
+
+
+//  if (!isLeaf(tree, n)) {
+//    float posX = computeFatherXPosition(n, oriLayout);
+//    setNodePosition(n, posX, 0.f, 0.f, oriLayout);
+//  }
+//}
+
 //====================================================================
 void Dendrogram::setAllNodesCoordY(OrientableLayout *oriLayout,
                                    OrientableSizeProxy *oriSize) {
@@ -189,7 +230,7 @@ void Dendrogram::setAllNodesCoordYBis(OrientableLayout *oriLayout,
 
     //    if (isLeaf(tree,currentNode)) {
     OrientableCoord coord = oriLayout->getNodeValue(currentNode);
-    float newY            = maxYLeaf + level->getNodeValue(currentNode) * spacing;
+    float newY            = maxYLeaf - level->getNodeValue(currentNode) * spacing;
     float coordX          = coord.getX();
     float coordZ          = coord.getZ();
     setNodePosition(currentNode, coordX, newY, coordZ, oriLayout);
@@ -226,6 +267,8 @@ void Dendrogram::shiftAllNodes(tlp::node n, float shift, OrientableLayout *oriLa
   float coordX            =  coord.getX();
 
   coord.setX(coordX + shift);
+
+
   oriLayout->setNodeValue(n, coord);
 
   Iterator<node>* itNode  =   tree->getOutNodes(n);
