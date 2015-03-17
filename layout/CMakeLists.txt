@@ -87,6 +87,10 @@ ADD_LIBRARY(Dendrogram-${TulipVersion} SHARED Dendrogram.cpp)
 TARGET_LINK_LIBRARIES(Dendrogram-${TulipVersion} ${LayoutUtilsLibraryName} ${LibTulipCoreName})
 
 ##----------------------------------------------------------------------------------------------------------------------------
+ADD_LIBRARY(MyPlugin-${TulipVersion} SHARED MyPlugin.cpp)
+TARGET_LINK_LIBRARIES(MyPlugin-${TulipVersion} ${LayoutUtilsLibraryName} ${LibTulipCoreName})
+
+##----------------------------------------------------------------------------------------------------------------------------
 ADD_LIBRARY(ImprovedWalker-${TulipVersion} SHARED ImprovedWalker.cpp)
 TARGET_LINK_LIBRARIES(ImprovedWalker-${TulipVersion} ${LayoutUtilsLibraryName} ${LibTulipCoreName})
 
@@ -119,6 +123,7 @@ INSTALL(TARGETS Circular-${TulipVersion} DESTINATION ${TulipPluginsInstallDir} C
 INSTALL(TARGETS HierarchicalGraph-${TulipVersion} DESTINATION ${TulipPluginsInstallDir} COMPONENT HierarchicalGraph)
 INSTALL(TARGETS Tutte-${TulipVersion} DESTINATION ${TulipPluginsInstallDir} COMPONENT Tutte)
 INSTALL(TARGETS Dendrogram-${TulipVersion} DESTINATION ${TulipPluginsInstallDir} COMPONENT Dendrogram)
+INSTALL(TARGETS MyPlugin-${TulipVersion} DESTINATION ${TulipPluginsInstallDir} COMPONENT MyPlugin)
 INSTALL(TARGETS ImprovedWalker-${TulipVersion} DESTINATION ${TulipPluginsInstallDir} COMPONENT ImprovedWalker)
 INSTALL(TARGETS SquarifiedTreeMap-${TulipVersion} DESTINATION ${TulipPluginsInstallDir} COMPONENT SquarifiedTreeMap)
 INSTALL(TARGETS PerfectLayout-${TulipVersion} DESTINATION ${TulipPluginsInstallDir} COMPONENT PerfectLayout)

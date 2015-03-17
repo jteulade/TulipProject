@@ -16,8 +16,8 @@
  * See the GNU General Public License for more details.
  *
  */
-#ifndef DENDROGRAM_H
-#define DENDROGRAM_H
+#ifndef MYPLUGIN_H
+#define MYPLUGIN_H
 
 #include <map>
 #include <vector>
@@ -29,7 +29,7 @@ class OrientableSizeProxy;
 
 /** \addtogroup layout */
 
-/** This plugin is an implementation of a dendrogram, an extended implementation
+/** This plugin is an implementation of a myPlugin, an extended implementation
  *  of a "Bio representation" which includes variable orientation
  *  and variable node sizelayout.
  *
@@ -40,19 +40,19 @@ class OrientableSizeProxy;
  *  Sebastien Leclerc, Thibault Ruchon, Eric Dauchier \n
  *  University Bordeaux I France
  **/
-class Dendrogram: public tlp::LayoutAlgorithm {
-public:
-  PLUGININFORMATION("Dendrogram",
+class MyPlugin: public tlp::LayoutAlgorithm {
+ public:
+  PLUGININFORMATION("MyPlugin",
                     "Julien Testut, Antony Durand, Pascal Ollier, "
                     "Yashvin Nababsing, Sebastien Leclerc, "
                     "Thibault Ruchon, Eric Dauchier",
                     "03/12/04", "ok", "1.0","Tree")
-  Dendrogram(const tlp::PluginContext* context);
-  ~Dendrogram();
+    MyPlugin(const tlp::PluginContext* context);
+  ~MyPlugin();
 
   bool run();
 
-private:
+ private:
   float spacing;
   float nodeSpacing;
 
@@ -64,8 +64,13 @@ private:
   float   setAllNodesCoordX(tlp::node n, float rightMargin,
                             OrientableLayout *oriLayout,
                             OrientableSizeProxy *oriSize);
+  void   setAllNodesCoordXBis(tlp::node n,
+                            OrientableLayout *oriLayout,
+                            OrientableSizeProxy *oriSize);
   void    setAllNodesCoordY(OrientableLayout *oriLayout,
                             OrientableSizeProxy *oriSize);
+  void    setAllNodesCoordYBis(OrientableLayout *oriLayout,
+			       OrientableSizeProxy *oriSize);
   float   computeFatherXPosition(tlp::node father,
                                  OrientableLayout *oriLayout);
   void    shiftAllNodes(tlp::node n, float shift,
@@ -80,6 +85,5 @@ private:
 };
 
 #endif
-
 
 
