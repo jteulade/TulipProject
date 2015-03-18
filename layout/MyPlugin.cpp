@@ -100,7 +100,7 @@ bool MyPlugin::run() {
       spacing = minLayerSpacing + nodeSpacing;
   }
 
-  IntegerProperty *idNode = tree->getProperty<IntegerProperty>("id_node");
+  IntegerProperty *positionNode = tree->getProperty<IntegerProperty>("position");
   Iterator<node> *itNode =  tree->getNodes();
 
 
@@ -111,7 +111,8 @@ bool MyPlugin::run() {
         node currentNode   = itNode->next();
         OrientableCoord coord   =  oriLayout->getNodeValue(currentNode);
         if (isLeaf(tree, currentNode)) {
-            coord.setX(idNode->getNodeValue(currentNode) * nodeSpacing);
+
+            coord.setX(positionNode->getNodeValue(currentNode) * nodeSpacing / 10000.);
             oriLayout->setNodeValue(currentNode, coord);
         } else {
             float posX = computeFatherXPosition(currentNode, oriLayout);
