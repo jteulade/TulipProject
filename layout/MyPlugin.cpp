@@ -110,15 +110,15 @@ bool MyPlugin::run() {
    while (itNode->hasNext()) {
         node currentNode   = itNode->next();
         OrientableCoord coord   =  oriLayout->getNodeValue(currentNode);
-        if (isLeaf(tree, currentNode)) {
+//        if (isLeaf(tree, currentNode)) {
 
             coord.setX(positionNode->getNodeValue(currentNode) * nodeSpacing / 10000.);
             oriLayout->setNodeValue(currentNode, coord);
-        } else {
-            float posX = computeFatherXPosition(currentNode, oriLayout);
-            coord.setX(posX);
-            oriLayout->setNodeValue(currentNode, coord);
-        }
+//        } else {
+//            float posX = computeFatherXPosition(currentNode, oriLayout);
+//            coord.setX(posX);
+//            oriLayout->setNodeValue(currentNode, coord);
+//        }
    }
 
 //  setAllNodesCoordXBis(root, 0.f, oriLayout, &oriSize);
