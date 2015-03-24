@@ -53,7 +53,7 @@ const char * paramHelp[] = {
     HTML_HELP_DEF( "type", "String Collection" ) \
       HTML_HELP_DEF( "default", "ALL" )   \
     HTML_HELP_BODY() \
-    "Allow to display only a specific level. \
+    "Allow to display only a specific level" \
     HTML_HELP_CLOSE()
 };
 }
