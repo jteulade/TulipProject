@@ -90,9 +90,10 @@ public:
       int step=0,max_step = graph->numberOfNodes();
       node n;
       forEach(n, selection ? selection->getNonDefaultValuatedNodes() : graph->getNodes()) {
-          if (level->getNodeValue(n) == levelSelection) {
+          if (levelSelection == -1 || level->getNodeValue(n) == levelSelection) {
             pluginProgress->progress(step++,max_step);
-            result->setNodeValue(n,input->getNodeStringValue(n));
+            //adding spaces allows to have distinct and readable labels on the graph
+            result->setNodeValue(n,"\n\n " + input->getNodeStringValue(n) + " ");
           }
       }
     }
