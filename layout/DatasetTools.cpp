@@ -95,6 +95,7 @@ void getSpacingParameters(DataSet* dataSet, float& nodeSpacing, float& layerSpac
     dataSet->get("layer spacing", layerSpacing);
   }
 }
+
 //====================================================================
 void addNodeSizePropertyParameter(LayoutAlgorithm* pLayout, bool inout) {
   if (inout)
