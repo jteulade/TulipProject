@@ -50,19 +50,22 @@ const char * paramHelp[] = {
 
     //level
     HTML_HELP_OPEN() \
-    HTML_HELP_DEF( "type", "IntegerProperty" ) \
+    HTML_HELP_DEF( "type", "String Collection" ) \
+      HTML_HELP_DEF( "default", "ALL" )   \
     HTML_HELP_BODY() \
-    "Allow to display only a specific level. Choose an integer between 0 and the max number of layers" \
+    "Allow to display only a specific level. \
     HTML_HELP_CLOSE()
 };
 }
 
+//allow to display only a specific variable level
+#define AGGREGATION_FUNCTIONS "ALL;SNP;VL1;VL2;VL3;VL4;VL5;VL6"
 class ToLabels: public tlp::StringAlgorithm {
 public:
   PLUGININFORMATION("To labels","Ludwig Fiolka","2012/03/16","Map a property on nodes/edges labels","1.0","")
   ToLabels(const tlp::PluginContext* context): StringAlgorithm(context) {
     addInParameter<PropertyInterface*>("input",paramHelp[0],"viewMetric",true);
-    addInParameter<int>("levelSelection", paramHelp[4], "0" );
+    addInParameter<StringCollection>("levelSelection", paramHelp[4], AGGREGATION_FUNCTIONS);
 
     addInParameter<BooleanProperty>("selection",paramHelp[1],"",false);
     addInParameter<bool>("nodes",paramHelp[2],"true");
@@ -71,7 +74,8 @@ public:
 
   bool run() {
     PropertyInterface* input = NULL;
-    int levelSelection;
+    StringCollection levelSelection(AGGREGATION_FUNCTIONS);
+    levelSelection.setCurrent(0);
     BooleanProperty* selection = NULL;
     bool onNodes = true;
     bool onEdges = true;
@@ -90,7 +94,8 @@ public:
       int step=0,max_step = graph->numberOfNodes();
       node n;
       forEach(n, selection ? selection->getNonDefaultValuatedNodes() : graph->getNodes()) {
-          if (levelSelection == -1 || level->getNodeValue(n) == levelSelection) {
+          //0 is when all the layers are selected
+          if (levelSelection.getCurrent() == 0 || levelSelection.getCurrent() - 1 == level->getNodeValue(n)) {
             pluginProgress->progress(step++,max_step);
             //adding spaces allows to have distinct and readable labels on the graph
             result->setNodeValue(n,"\n\n " + input->getNodeStringValue(n) + " ");
