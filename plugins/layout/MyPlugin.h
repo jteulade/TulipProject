@@ -61,25 +61,12 @@ class MyPlugin: public tlp::LayoutAlgorithm {
   tlp::Graph *tree;
   std::vector<float> levelHeights;
 
-  float   setAllNodesCoordX(tlp::node n, float rightMargin,
-                            OrientableLayout *oriLayout,
-                            OrientableSizeProxy *oriSize);
-  void   setAllNodesCoordXBis(tlp::node n,
-                            OrientableLayout *oriLayout,
-                            OrientableSizeProxy *oriSize);
-  void    setAllNodesCoordY(OrientableLayout *oriLayout,
-                            OrientableSizeProxy *oriSize);
-  void    setAllNodesCoordYBis(OrientableLayout *oriLayout,
-			       OrientableSizeProxy *oriSize);
-  float   computeFatherXPosition(tlp::node father,
-                                 OrientableLayout *oriLayout);
-  void    shiftAllNodes(tlp::node n, float shift,
-                        OrientableLayout *oriLayout);
+
+  void   setAllNodesCoordXY(OrientableLayout *oriLayout);
+
   void    setNodePosition(tlp::node n, float x, float y, float z,
                           OrientableLayout *oriLayout);
-  void    setCoordY(tlp::node n, float& maxYLeaf,
-                    OrientableLayout *oriLayout,
-                    OrientableSizeProxy *oriSize);
+
   void computeLevelHeights(tlp::Graph* tree, tlp::node n, unsigned int depth,
                            OrientableSizeProxy *oriSize);
 };

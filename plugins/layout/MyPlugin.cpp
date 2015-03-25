@@ -34,7 +34,6 @@ MyPlugin::MyPlugin(const tlp::PluginContext* context)
 :LayoutAlgorithm(context) {
   addNodeSizePropertyParameter(this);
   addOrientationParameters(this);
-  addOrthogonalParameters(this);
   addSpacingParameters(this);
 }
 
@@ -100,34 +99,7 @@ bool MyPlugin::run() {
       spacing = minLayerSpacing + nodeSpacing;
   }
 
-  IntegerProperty *positionNode = tree->getProperty<IntegerProperty>("position");
-  Iterator<node> *itNode =  tree->getNodes();
-
-
-
-
-
-   while (itNode->hasNext()) {
-        node currentNode   = itNode->next();
-        OrientableCoord coord   =  oriLayout->getNodeValue(currentNode);
-//        if (isLeaf(tree, currentNode)) {
-
-            coord.setX(positionNode->getNodeValue(currentNode) * nodeSpacing / 10000.);
-            oriLayout->setNodeValue(currentNode, coord);
-//        } else {
-//            float posX = computeFatherXPosition(currentNode, oriLayout);
-//            coord.setX(posX);
-//            oriLayout->setNodeValue(currentNode, coord);
-//        }
-   }
-
-//  setAllNodesCoordXBis(root, 0.f, oriLayout, &oriSize);
-//  shiftAllNodes(root, 0.f, oriLayout);
-  setAllNodesCoordYBis(oriLayout, &oriSize);
-
-  if (hasOrthogonalEdge(dataSet))
-    oriLayout->setOrthogonalEdge(graph, spacing);
-
+  setAllNodesCoordXY(oriLayout);
 
   // forget last temporary graph state
   graph->pop();
@@ -137,177 +109,39 @@ bool MyPlugin::run() {
 }
 
 //====================================================================
-float MyPlugin::setAllNodesCoordX(tlp::node n, float rightMargin,
-                                    OrientableLayout *oriLayout, OrientableSizeProxy *oriSize) {
-  float leftMargin       = rightMargin;
+void MyPlugin::setAllNodesCoordXY(OrientableLayout *oriLayout) {
 
-  Iterator<node>* itNode = tree->getOutNodes(n);
+    //Return the variable position on the genome
+    IntegerProperty *position = tree->getProperty<IntegerProperty>("position");
 
-  while (itNode->hasNext()) {
-    node currentNode   = itNode->next();
-    leftMargin         = setAllNodesCoordX(currentNode, leftMargin, oriLayout, oriSize);
-  }
+    //Return the variable level (SNPs, latent variables)
+    IntegerProperty *level = tree->getProperty<IntegerProperty>("level");
 
-  delete itNode;
+    Iterator<node> *itNode =  tree->getNodes();
 
-  const float nodeWidth  =  oriSize->getNodeValue(n).getW()
-    + nodeSpacing;
+    while (itNode->hasNext()) {
+        node currentNode   = itNode->next();
+        OrientableCoord coord   =  oriLayout->getNodeValue(currentNode);
 
-  if (isLeaf(tree, n))
-    leftMargin = rightMargin + nodeWidth;
+        //x depends of the variable position on the genome
+        float newX      =   position->getNodeValue(currentNode) * nodeSpacing / 10000.;
 
-  const float freeRange  = leftMargin - rightMargin;
+        //y depends of the variable level
+        float newY      = - level->getNodeValue(currentNode) * spacing;
 
-  float posX;
+        float coordZ    =   coord.getZ();
 
-  if (isLeaf(tree, n))
-    posX = freeRange / 2.f + rightMargin;
-  else
-    posX = computeFatherXPosition(n, oriLayout);
-
-  const float rightOverflow = max(rightMargin-(posX-nodeWidth/2.f), 0.f);
-  const float leftOverflow  = max((posX+nodeWidth/2.f)-leftMargin, 0.f);
-  leftshift[n]              = rightOverflow;
-
-  setNodePosition(n, posX, 0.f, 0.f, oriLayout);
-  return  leftMargin + leftOverflow + rightOverflow;
-}
-
-//void MyPlugin::setAllNodesCoordXBis(tlp::node n,
-//                                    OrientableLayout *oriLayout, OrientableSizeProxy *oriSize) {
-
-//  Iterator<node>* itNode = tree->getOutNodes(n);
-
-//  while (itNode->hasNext()) {
-//    node currentNode   = itNode->next();
-//    setAllNodesCoordX(currentNode, oriLayout, oriSize);
-//  }
-
-//  delete itNode;
-
-
-
-//  if (!isLeaf(tree, n)) {
-//    float posX = computeFatherXPosition(n, oriLayout);
-//    setNodePosition(n, posX, 0.f, 0.f, oriLayout);
-//  }
-//}
-
-//====================================================================
-void MyPlugin::setAllNodesCoordY(OrientableLayout *oriLayout,
-                                   OrientableSizeProxy *oriSize) {
-  float maxYLeaf         = -FLT_MAX;
-  setCoordY(root, maxYLeaf, oriLayout, oriSize);
-
-  Iterator<node>* itNode = tree->getNodes();
-
-  while (itNode->hasNext()) {
-    node currentNode   = itNode->next();
-
-    if (isLeaf(tree,currentNode)) {
-      OrientableCoord coord = oriLayout->getNodeValue(currentNode);
-      float newY            = maxYLeaf;
-      float coordX          = coord.getX();
-      float coordZ          = coord.getZ();
-      setNodePosition(currentNode, coordX, newY, coordZ, oriLayout);
+        setNodePosition(currentNode, newX, newY, coordZ, oriLayout);
     }
-  }
-
-  delete itNode;
-}
-
-void MyPlugin::setAllNodesCoordYBis(OrientableLayout *oriLayout,
-				      OrientableSizeProxy *oriSize) {
-
-  IntegerProperty *level = tree->getProperty<IntegerProperty>("level");
-
-  float maxYLeaf         = 0;
-  //  setCoordY(root, maxYLeaf, oriLayout, oriSize);
-
-  Iterator<node>* itNode = tree->getNodes();
-
-  while (itNode->hasNext()) {
-    node currentNode   = itNode->next();
-
-    //    if (isLeaf(tree,currentNode)) {
-    OrientableCoord coord = oriLayout->getNodeValue(currentNode);
-    float newY            = maxYLeaf - level->getNodeValue(currentNode) * spacing;
-    float coordX          = coord.getX();
-    float coordZ          = coord.getZ();
-    setNodePosition(currentNode, coordX, newY, coordZ, oriLayout);
-    //    }
-  }
-
-  delete itNode;
+    delete itNode;
 }
 
 
-//====================================================================
-float MyPlugin::computeFatherXPosition(tlp::node father, OrientableLayout *oriLayout) {
-  float minX             =  FLT_MAX;
-  float maxX             = -FLT_MAX;
 
-  Iterator<node> *itNode =  tree->getOutNodes(father);
-
-  while (itNode->hasNext()) {
-    node currentNode   = itNode->next();
-    const float x      =  oriLayout->getNodeValue(currentNode).getX()
-      + leftshift[currentNode];
-    minX               = min(minX, x);
-    maxX               = max(maxX, x);
-  }
-
-  delete itNode;
-  return (maxX + minX) / 2.f;
-}
-
-//====================================================================
-void MyPlugin::shiftAllNodes(tlp::node n, float shift, OrientableLayout *oriLayout) {
-  OrientableCoord coord   =  oriLayout->getNodeValue(n);
-  shift                  +=  leftshift[n];
-  float coordX            =  coord.getX();
-
-  coord.setX(coordX + shift);
-
-
-  oriLayout->setNodeValue(n, coord);
-
-  Iterator<node>* itNode  =   tree->getOutNodes(n);
-
-  while (itNode->hasNext())
-    shiftAllNodes(itNode->next(), shift, oriLayout);
-
-  delete itNode;
-}
 
 //====================================================================
 inline void MyPlugin::setNodePosition(tlp::node n, float x, float y,
                                         float z, OrientableLayout *oriLayout) {
   OrientableCoord coord = oriLayout->createCoord(x, y, z);
   oriLayout->setNodeValue(n, coord);
-}
-
-//====================================================================
-void MyPlugin::setCoordY(tlp::node n, float& maxYLeaf,
-                           OrientableLayout *oriLayout, OrientableSizeProxy *oriSize) {
-  if (tree->indeg(n) != 0) {
-    node fatherNode             = tree->getInNode(n, 1);
-    OrientableCoord coord       = oriLayout->getNodeValue(n);
-    OrientableCoord coordFather = oriLayout->getNodeValue(fatherNode);
-    float nodeY                 = coordFather.getY() + spacing;
-
-    coord.setY(nodeY);
-    oriLayout->setNodeValue(n, coord);
-
-    if (isLeaf(tree, n)) {
-      maxYLeaf = max(maxYLeaf, nodeY);
-    }
-  }
-
-  Iterator<node> *itNode = tree->getOutNodes(n);
-
-  while (itNode->hasNext())
-    setCoordY(itNode->next(), maxYLeaf, oriLayout, oriSize);
-
-  delete itNode;
 }
