@@ -41,6 +41,7 @@ MouseShowElementInfos::MouseShowElementInfos():_ui(new Ui::ElementInformationsWi
   tableView()->setItemDelegate(new TulipItemDelegate);
   _informationsWidgetItem->setWidget(_informationsWidget);
   _informationsWidgetItem->setVisible(false);
+
 }
 
 MouseShowElementInfos::~MouseShowElementInfos() {
@@ -99,6 +100,9 @@ bool MouseShowElementInfos::eventFilter(QObject *widget, QEvent* e) {
             QLabel* title = _informationsWidget->findChild<QLabel*>();
 
             ElementType eltType = selectedEntity.getEntityType() == SelectedEntity::NODE_SELECTED?NODE:EDGE;
+            if (!_specificGraph) {
+                constructSpecificGraph();
+            }
 
             tableView()->setModel(buildModel(eltType,selectedEntity.getComplexEntityId(),_informationsWidget));
             title->setText(elementName(eltType,selectedEntity.getComplexEntityId()));
@@ -153,10 +157,10 @@ void MouseShowElementInfos::viewChanged(View * view) {
 
 QAbstractItemModel* MouseShowElementInfos::buildModel(ElementType elementType,unsigned int elementId,QObject* parent)const {
   if(elementType == NODE) {
-    return new GraphNodeElementModel(view()->graph(),elementId,parent);
+    return new GraphNodeElementModel(_specificGraph,elementId,parent);
   }
   else {
-    return new GraphEdgeElementModel(view()->graph(),elementId,parent);
+    return new GraphEdgeElementModel(_specificGraph,elementId,parent);
   }
 }
 
@@ -164,3 +168,30 @@ QString MouseShowElementInfos::elementName(ElementType elementType, unsigned int
   QString elementTypeLabel = elementType==NODE?QString("Node"):QString("Edge");
   return elementTypeLabel +" #" + QString::number(elementId);
 }
+
+void MouseShowElementInfos::constructSpecificGraph() {
+    _specificGraph = newGraph();
+    copyToGraph(_specificGraph,view()->graph());
+    _specificGraph->delLocalProperty("viewBorderWidth");
+    _specificGraph->delLocalProperty("viewLabelPosition");
+    _specificGraph->delLocalProperty("viewBorderColor");
+    _specificGraph->delLocalProperty("viewColor");
+    _specificGraph->delLocalProperty("viewFont");
+    _specificGraph->delLocalProperty("viewFontSize");
+    _specificGraph->delLocalProperty("viewLabel");
+    _specificGraph->delLocalProperty("viewLabelBorderColor");
+    _specificGraph->delLocalProperty("viewLabelBorderWidth");
+    _specificGraph->delLocalProperty("viewLabelColor");
+    _specificGraph->delLocalProperty("viewLayout");
+    _specificGraph->delLocalProperty("viewMetric");
+    _specificGraph->delLocalProperty("viewRotation");
+    _specificGraph->delLocalProperty("viewSelection");
+    _specificGraph->delLocalProperty("viewShape");
+    _specificGraph->delLocalProperty("viewSize");
+    _specificGraph->delLocalProperty("viewSrcAnchorShape");
+    _specificGraph->delLocalProperty("viewSrcAnchorSize");
+    _specificGraph->delLocalProperty("viewTexture");
+    _specificGraph->delLocalProperty("viewTgtAnchorShape");
+    _specificGraph->delLocalProperty("viewTgtAnchorSize");
+}
+

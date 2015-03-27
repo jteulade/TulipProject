@@ -62,6 +62,7 @@ protected:
   ViewWidget *_view;
   QWidget *_informationsWidget;
   QGraphicsProxyWidget *_informationsWidgetItem;
+  Graph *_specificGraph;
 
   QTableView* tableView() const;
 
@@ -80,6 +81,9 @@ protected:
    * @return
    */
   virtual QString elementName(ElementType elementType, unsigned int elementId)const;
+
+
+  virtual void constructSpecificGraph();
 };
 
 }
