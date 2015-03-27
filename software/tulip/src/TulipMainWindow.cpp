@@ -43,10 +43,12 @@
 #include "PerspectiveSelectionDialog.h"
 
 using namespace tlp;
+using namespace std;
 
 TulipMainWindow* TulipMainWindow::_instance = NULL;
 
 TulipMainWindow::TulipMainWindow(QWidget *parent): QMainWindow(parent), _ui(new Ui::TulipMainWindowData()), _systemTrayIcon(0) {
+    openProject("/home/jules/SAMOGWAS/Tulip4.6/TulipProjects/testCSV.tlpx");
   _ui->setupUi(this);
 
   _errorMessage = new QLabel();
