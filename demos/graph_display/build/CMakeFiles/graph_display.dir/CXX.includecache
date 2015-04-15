@@ -1,0 +1,44 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/jules/SAMOGWAS/Tulip4.6/tulip-src/demos/graph_display/graph_display.cpp
+tulip/PluginLoaderTxt.h
+-
+tulip/PluginLibraryLoader.h
+-
+tulip/GlMainWidget.h
+-
+tulip/MouseInteractors.h
+-
+tulip/TlpQtTools.h
+-
+tulip/LayoutProperty.h
+-
+tulip/SizeProperty.h
+-
+tulip/StringProperty.h
+-
+tulip/DoubleProperty.h
+-
+tulip/IntegerProperty.h
+-
+tulip/TulipViewSettings.h
+-
+tulip/GlGraphComposite.h
+-
+tulip/GlGraphRenderingParameters.h
+-
+tulip/ForEach.h
+-
+QApplication
+-
+QString
+-
+iostream
+-
+

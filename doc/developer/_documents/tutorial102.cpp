@@ -28,40 +28,40 @@ int main(int argc, char** argv) {
 	Initialize the library, load plugins and set application runtime pathes accordingly to the host operating system
 	This method should always be called if you intend to use plugins in your application.
 	*/
-	tlp::initTulipSoftware(NULL);
+    tlp::initTulipLib("/home/jules/SAMOGWAS/Tulip4.6/install-debug/");
 
-	// Creates the main widget that will display our graph
-	GlMainWidget* mainWidget = new GlMainWidget(NULL);
-	// Adds a layer to the scene
-	GlLayer* mainLayer = mainWidget->getScene()->createLayer("Main");
+    // Creates the main widget that will display our graph
+    GlMainWidget* mainWidget = new GlMainWidget(NULL);
+    // Adds a layer to the scene
+    GlLayer* mainLayer = mainWidget->getScene()->getLayer("Main");
 
-	Coord center1(-1,-1,-1);
-	Coord center2(1,1,1);
-	Size size(1,1,1);
-	Color whiteOpaque(255, 255, 255, 255);
-	Color blackOpaque(0, 0, 0, 255);
+    Coord center1(-1,-1,-1);
+    Coord center2(1,1,1);
+    Size size(1,1,1);
+    Color whiteOpaque(255, 255, 255, 255);
+    Color blackOpaque(0, 0, 0, 255);
 
-	GlBox *node1 = new GlBox(center1, size, whiteOpaque, blackOpaque);
-	GlBox *node2 = new GlBox(center2, size, whiteOpaque, blackOpaque);
+    GlBox *node1 = new GlBox(center1, size, whiteOpaque);
+    GlBox *node2 = new GlBox(center2, size, whiteOpaque);
 
   mainLayer->addGlEntity(node1, "Gl Tutorial 1: Node 1");
   mainLayer->addGlEntity(node2, "Gl Tutorial 1: Node 2");
 
   Coord centerBox(0, 0, 0);
   Size sizeBox(3.001, 3.001, 3.001);
-	Color purpleTrans(155, 0, 155, 50);
-	GlBox *box = new GlBox(centerBox, sizeBox, purpleTrans, blackOpaque);
+    Color purpleTrans(155, 0, 155, 50);
+    GlBox *box = new GlBox(centerBox, sizeBox, purpleTrans);
   mainLayer->addGlEntity(box, "Gl Tutorial 2: Box");
 
-	// Display the widget
-	mainWidget->show();
-	// Flush event loop in order to let paint events pass through in order for the scene to be initialized.
-	QApplication::processEvents();
-	// Center the camera and draw the graph
-	mainWidget->centerScene();
-	mainWidget->draw();
-	// Adds Zoom and pan navigation to the widget
-	mainWidget->installEventFilter(new MouseNKeysNavigator);
+    // Display the widget
+    mainWidget->show();
+    // Flush event loop in order to let paint events pass through in order for the scene to be initialized.
+    QApplication::processEvents();
+    // Center the camera and draw the graph
+    //mainWidget->centerScene();
+    mainWidget->draw();
+    // Adds Zoom and pan navigation to the widget
+    mainWidget->installEventFilter(new MouseNKeysNavigator);
 	return app.exec();
 }
 

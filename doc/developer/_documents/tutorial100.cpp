@@ -3,6 +3,9 @@
 #include <tulip/GlMainWidget.h>
 #include <tulip/MouseInteractors.h>
 #include <QApplication>
+#include <QString>
+#include </home/jules/SAMOGWAS/Tulip4.6/install-debug/include/tulip/PluginLister.h>
+#include "TulipPerspectiveProcessHandler.h"
 
 /**
  * Tutorial 100
@@ -27,26 +30,33 @@ int main(int argc, char** argv) {
 	Initialize the library, load plugins and set application runtime pathes accordingly to the host operating system
 	This method should always be called if you intend to use plugins in your application.
 	*/
-	tlp::initTulipLib("/home/tulip/Documents/tulip/install-release/");
+    tlp::initTulipLib("/home/jules/SAMOGWAS/Tulip4.6/install-debug/");
 
-	// Create the main widget that will display our graph
-	GlMainWidget* mainWidget = new GlMainWidget(NULL);
 
-	// Add a layer to the scene
-	GlLayer* mainLayer = mainWidget->getScene()->createLayer("Main");
+    std::string stdName = *(PluginLister::instance()->availablePlugins<tlp::Perspective>().begin());
+    QString perspectiveName = stdName.c_str();
 
-	// Display the widget
-	mainWidget->show();
+    if (!perspectiveName.isNull())
+        TulipPerspectiveProcessHandler::instance()->createPerspective(perspectiveName,"/home/jules/SAMOGWAS/Tulip4.6/TulipProjects/testCSV.tlpx",QVariantMap());
 
-	// Flush event loop to let paint events pass through, allowing for the scene to be initialized.
-	QApplication::processEvents();
+    // Create the main widget that will display our graph
+    GlMainWidget* mainWidget = new GlMainWidget(NULL);
 
-	// Center the camera and draw the graph
-	mainWidget->centerScene();
-	mainWidget->draw();
+    // Add a layer to the scene
+    GlLayer* mainLayer = mainWidget->getScene()->getLayer("Main");
 
-	// Add Zoom and pan navigation to the widget
-	mainWidget->installEventFilter(new MouseNKeysNavigator);
+    // Display the widget
+    mainWidget->show();
+
+    // Flush event loop to let paint events pass through, allowing for the scene to be initialized.
+    QApplication::processEvents();
+
+    // Center the camera and draw the graph
+//	mainWidget->centerScene();
+    mainWidget->draw();
+
+    // Add Zoom and pan navigation to the widget
+    mainWidget->installEventFilter(new MouseNKeysNavigator);
 
 	return app.exec();
 }

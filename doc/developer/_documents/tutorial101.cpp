@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
 	Initialize the library, load plugins and set application runtime pathes accordingly to the host operating system
 	This method should always be called if you intend to use plugins in your application.
 	*/
-	tlp::initTulipSoftware(NULL);
+    tlp::initTulipLib("/home/jules/SAMOGWAS/Tulip4.6/install-debug/");
 
 	// Create the main widget that will display our graph
 	GlMainWidget* mainWidget = new GlMainWidget(NULL);
