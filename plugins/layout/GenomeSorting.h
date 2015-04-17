@@ -16,8 +16,8 @@
  * See the GNU General Public License for more details.
  *
  */
-#ifndef MYPLUGIN_H
-#define MYPLUGIN_H
+#ifndef GENOMESORTING_H
+#define GENOMESORTING_H
 
 #include <map>
 #include <vector>
@@ -29,26 +29,23 @@ class OrientableSizeProxy;
 
 /** \addtogroup layout */
 
-/** This plugin is an implementation of a myPlugin, an extended implementation
+/** This plugin is an implementation of a GenomeSorting, an extended implementation
  *  of a "Bio representation" which includes variable orientation
  *  and variable node sizelayout.
  *
  *  \note This works on tree.
  *  Let n be the number of nodes, the algorithm complexity is in O(n).
  *
- *  \author Julien Testut, Antony Durand, Pascal Ollier, Yashvin Nababsing, \n
- *  Sebastien Leclerc, Thibault Ruchon, Eric Dauchier \n
- *  University Bordeaux I France
+ *  \author Jules Teulade-Denantes
+ *  University Nantes France
  **/
-class MyPlugin: public tlp::LayoutAlgorithm {
+class GenomeSorting: public tlp::LayoutAlgorithm {
  public:
-  PLUGININFORMATION("MyPlugin",
-                    "Julien Testut, Antony Durand, Pascal Ollier, "
-                    "Yashvin Nababsing, Sebastien Leclerc, "
-                    "Thibault Ruchon, Eric Dauchier",
+  PLUGININFORMATION("GenomeSorting",
+                    "Jules Teulade-Denantes",
                     "03/12/04", "ok", "1.0","Tree")
-    MyPlugin(const tlp::PluginContext* context);
-  ~MyPlugin();
+    GenomeSorting(const tlp::PluginContext* context);
+  ~GenomeSorting();
 
   bool run();
 

@@ -22,15 +22,15 @@
 #include "TreeTools.h"
 #include "Orientation.h"
 #include "DatasetTools.h"
-#include "MyPlugin.h"
+#include "GenomeSorting.h"
 using namespace std;
 using namespace tlp;
 
 
-PLUGIN(MyPlugin)
+PLUGIN(GenomeSorting)
 
 //====================================================================
-MyPlugin::MyPlugin(const tlp::PluginContext* context)
+GenomeSorting::GenomeSorting(const tlp::PluginContext* context)
 :LayoutAlgorithm(context) {
   addNodeSizePropertyParameter(this);
   addOrientationParameters(this);
@@ -38,10 +38,10 @@ MyPlugin::MyPlugin(const tlp::PluginContext* context)
 }
 
 //====================================================================
-MyPlugin::~MyPlugin() {
+GenomeSorting::~GenomeSorting() {
 }
 //====================================================================
-void MyPlugin::computeLevelHeights(tlp::Graph *tree, tlp::node n, unsigned int depth,
+void GenomeSorting::computeLevelHeights(tlp::Graph *tree, tlp::node n, unsigned int depth,
                                      OrientableSizeProxy *oriSize) {
   if (levelHeights.size() == depth)
     levelHeights.push_back(0);
@@ -56,7 +56,7 @@ void MyPlugin::computeLevelHeights(tlp::Graph *tree, tlp::node n, unsigned int d
     computeLevelHeights(tree, on, depth + 1, oriSize);
 }
 //====================================================================
-bool MyPlugin::run() {
+bool GenomeSorting::run() {
   orientationType mask = getMask(dataSet);
   OrientableLayout *oriLayout = new OrientableLayout(result, mask);
   SizeProperty* size;
@@ -109,7 +109,7 @@ bool MyPlugin::run() {
 }
 
 //====================================================================
-void MyPlugin::setAllNodesCoordXY(OrientableLayout *oriLayout) {
+void GenomeSorting::setAllNodesCoordXY(OrientableLayout *oriLayout) {
 
     //Return the variable position on the genome
     IntegerProperty *position = tree->getProperty<IntegerProperty>("position");
@@ -140,7 +140,7 @@ void MyPlugin::setAllNodesCoordXY(OrientableLayout *oriLayout) {
 
 
 //====================================================================
-inline void MyPlugin::setNodePosition(tlp::node n, float x, float y,
+inline void GenomeSorting::setNodePosition(tlp::node n, float x, float y,
                                         float z, OrientableLayout *oriLayout) {
   OrientableCoord coord = oriLayout->createCoord(x, y, z);
   oriLayout->setNodeValue(n, coord);
