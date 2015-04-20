@@ -89,19 +89,7 @@ public:
       dataSet->get("edges",onEdges);
     }
     IntegerProperty *level = graph->getProperty<IntegerProperty>("level");
-    IntegerProperty *position = graph->getProperty<IntegerProperty>("position");
-    // Build some maps to set shapes and colors according to the dag level of a node
-    std::vector<int> glyphsMap;
-    glyphsMap.push_back(tlp::NodeShape::Star);
 
-
-    std::vector<Color> colorsMap;
-    colorsMap.push_back(Color::Azure);
-
-    // Sets different shapes and colors for each layer of the tree
-    IntegerProperty *viewShape = graph->getProperty<IntegerProperty>("viewShape");
-    ColorProperty *viewColor = graph->getProperty<ColorProperty>("viewColor");
-    SizeProperty *viewSize = graph->getProperty<SizeProperty>("viewSize");
 
     if (onNodes) {
       pluginProgress->setComment("Copying nodes values");
@@ -113,11 +101,6 @@ public:
             pluginProgress->progress(step++,max_step);
             //adding spaces allows to have distinct and readable labels on the graph
             result->setNodeValue(n,"\n\n " + input->getNodeStringValue(n) + " ");
-          }
-          if (level->getNodeValue(n) == 0 && position->getNodeValue(n)%20 == 0 ) {
-              viewShape->setNodeValue(n, tlp::NodeShape::Star);
-              viewColor->setNodeValue(n, Color::Azure);
-              viewSize->setNodeValue(n, Size(50,50,50));
           }
 
       }
