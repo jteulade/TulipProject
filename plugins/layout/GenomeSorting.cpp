@@ -112,6 +112,11 @@ bool GenomeSorting::run() {
 
   setAllNodesCoordXY(oriLayout);
 
+  //adjust the edge size according to the source node and the target node
+  edge e;
+  forEach(e,tree->getEdges())
+      viewSize->setEdgeValue(e, getEdgeValue(e));
+
   // forget last temporary graph state
   graph->pop();
 
@@ -175,4 +180,14 @@ inline void GenomeSorting::setNodePosition(tlp::node n, float x, float y,
                                         float z, OrientableLayout *oriLayout) {
   OrientableCoord coord = oriLayout->createCoord(x, y, z);
   oriLayout->setNodeValue(n, coord);
+}
+
+Size GenomeSorting::getEdgeValue(const edge e) {
+  Size s = result->getNodeValue(tree->source(e));
+  Size t = result->getNodeValue(tree->target(e));
+  Coord tmp(s.getW(),s.getH(),s.getD());
+  Coord tmp2(t.getW(),t.getH(),t.getD());
+  float sizes=tmp.norm();
+  float sizet=tmp2.norm();
+  return (Size(sizes/16,sizet/16,sizet/4));
 }

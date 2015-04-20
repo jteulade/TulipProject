@@ -66,6 +66,9 @@ class GenomeSorting: public tlp::LayoutAlgorithm {
 
   void computeLevelHeights(tlp::Graph* tree, tlp::node n, unsigned int depth,
                            OrientableSizeProxy *oriSize);
+
+  //this function calculate the edge size according to the source node and the target node
+  tlp::Size getEdgeValue(const tlp::edge e);
 };
 
 #endif
