@@ -64,8 +64,9 @@ bool GenomeSorting::run() {
   if (!getNodeSizePropertyParameter(dataSet, size))
     size = graph->getProperty<SizeProperty>("viewSize");
 
-  //allow to modify the nodes color
+  //allow to modify the nodes color and size
   ColorProperty *viewColor = graph->getProperty<ColorProperty>("viewColor");
+  SizeProperty *viewSize = graph->getProperty<SizeProperty>("viewSize");
 
   OrientableSizeProxy oriSize(size, mask);
   getSpacingParameters(dataSet, nodeSpacing, spacing);
@@ -83,6 +84,10 @@ bool GenomeSorting::run() {
   //preserve the changes of nodes color
   if (viewColor->getName() != "")
     propsToPreserve.push_back(viewColor);
+
+  //preserve the changes of nodes size
+  if (viewSize->getName() != "")
+    propsToPreserve.push_back(viewSize);
 
   graph->push(false, &propsToPreserve);
 
@@ -125,6 +130,8 @@ void GenomeSorting::setAllNodesCoordXY(OrientableLayout *oriLayout) {
 
     Iterator<node> *itNode =  tree->getNodes();
 
+    SizeProperty *viewSize = tree->getProperty<SizeProperty>("viewSize");
+
     ColorProperty *viewColor = tree->getProperty<ColorProperty>("viewColor");
     //adapt the colors according to the nodes level
     std::vector<Color> levelColor;
@@ -151,6 +158,11 @@ void GenomeSorting::setAllNodesCoordXY(OrientableLayout *oriLayout) {
 
         //we modify the current node color according to its level
         viewColor->setNodeValue(currentNode, levelColor[level->getNodeValue(currentNode)]);
+
+        //we choose the nodes size according to its level.
+        //the values have been chosen arbitrarily
+        int levelSize = (level->getNodeValue(currentNode) + 0.1) * 10;
+        viewSize->setNodeValue(currentNode,  Size(levelSize,levelSize,levelSize));
     }
     delete itNode;
 }
