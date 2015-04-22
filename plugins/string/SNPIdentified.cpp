@@ -24,31 +24,6 @@ using namespace tlp;
 
 namespace {
 const char * paramHelp[] = {
-  // property
-  HTML_HELP_OPEN() \
-  HTML_HELP_DEF( "type", "PropertyInterface" ) \
-  HTML_HELP_BODY() \
-  "Property to copy on labels" \
-  HTML_HELP_CLOSE(),
-  HTML_HELP_OPEN() \
-  HTML_HELP_DEF( "type", "BooleanProperty" ) \
-  HTML_HELP_DEF( "default", "none" ) \
-  HTML_HELP_BODY() \
-  "Set of elements for which to set the labels." \
-  HTML_HELP_CLOSE(),
-  // on nodes
-  HTML_HELP_OPEN() \
-  HTML_HELP_DEF( "type", "bool" ) \
-  HTML_HELP_BODY() \
-  "Copy nodes values" \
-  HTML_HELP_CLOSE(),
-  // property
-  HTML_HELP_OPEN() \
-  HTML_HELP_DEF( "type", "bool" ) \
-  HTML_HELP_BODY() \
-  "Copy edges values" \
-  HTML_HELP_CLOSE(),
-
     //level
     HTML_HELP_OPEN() \
     HTML_HELP_DEF( "type", "String Collection" ) \
@@ -56,52 +31,64 @@ const char * paramHelp[] = {
     HTML_HELP_BODY() \
     "Allow to display only a specific level" \
     HTML_HELP_CLOSE()
+
+    //options
+    HTML_HELP_OPEN() \
+    HTML_HELP_DEF( "type", "String Collection" ) \
+      HTML_HELP_DEF( "default", "ALL" )   \
+    HTML_HELP_BODY() \
+    "Allow to choose the option to display" \
+    HTML_HELP_CLOSE()
 };
 }
 
 //allow to display only a specific variable level
-#define AGGREGATION_FUNCTIONS "ALL;SNP;VL1;VL2;VL3;VL4;VL5;VL6"
+#define LEVEL_DISPLAY "ALL;SNP;VL1;VL2;VL3;VL4;VL5;VL6"
+#define INFORMATIONS "ALL;POSITIONS;DISEASES"
 class SNPIdentified: public tlp::StringAlgorithm {
 public:
   PLUGININFORMATION("SNP identified","Jules Teulade-Denantes","2012/03/16","Identify SNPs related to a disease","1.0","")
   SNPIdentified(const tlp::PluginContext* context): StringAlgorithm(context) {
-    addInParameter<PropertyInterface*>("input",paramHelp[0],"viewMetric",true);
-    addInParameter<StringCollection>("levelSelection", paramHelp[4], AGGREGATION_FUNCTIONS);
+    addInParameter<StringCollection>("levelSelection", paramHelp[0], LEVEL_DISPLAY);
+    addInParameter<StringCollection>("displayOption", paramHelp[1], INFORMATIONS);
   }
 
   bool run() {
-    PropertyInterface* input = NULL;
-    StringCollection levelSelection(AGGREGATION_FUNCTIONS);
+    StringCollection levelSelection(LEVEL_DISPLAY);
+    StringCollection displayOption(INFORMATIONS);
     levelSelection.setCurrent(0);
 
     if (dataSet != NULL) {
-      dataSet->get("input",input);
       dataSet->get("levelSelection",levelSelection);
+      dataSet->get("displayOption",displayOption);
     }
     IntegerProperty *level = graph->getProperty<IntegerProperty>("level");
     IntegerProperty *position = graph->getProperty<IntegerProperty>("position");
 
-
-
     // Sets different shapes and colors for each layer of the tree
     IntegerProperty *viewShape = graph->getProperty<IntegerProperty>("viewShape");
     ColorProperty *viewColor = graph->getProperty<ColorProperty>("viewColor");
-    SizeProperty *viewSize = graph->getProperty<SizeProperty>("viewSize");
 
-      pluginProgress->setComment("Copying nodes values");
-      node n;
-      forEach(n, graph->getNodes()) {
-          //all the level: 0 && condition on a node (pvalue for example)
-          if ((levelSelection.getCurrent() == 0 || levelSelection.getCurrent() - 1 == level->getNodeValue(n))
-                  && position->getNodeValue(n)%20 == 0 ) {
-              //we choose a specific layout for the identified SNPS
-              viewShape->setNodeValue(n, tlp::NodeShape::Star);
-              viewColor->setNodeValue(n, Color::Azure);
-              viewSize->setNodeValue(n, Size(30,30,30));
-          }
+    pluginProgress->setComment("Copying nodes values");
+    node n;
 
-      }
-
+    forEach(n, graph->getNodes()) {
+        //all the level: 0
+        if (levelSelection.getCurrent() == 0 || levelSelection.getCurrent() - 1 == level->getNodeValue(n)) {
+            std::string nodeLabel = "";
+            //if we choose to display diseases  && condition on a node (pvalue for example)
+            if (displayOption.getCurrent()%2 == 0 && position->getNodeValue(n)%20 == 0) {
+                //we choose a specific layout for the identified SNPS
+                viewShape->setNodeValue(n, tlp::NodeShape::Star);
+                viewColor->setNodeValue(n, Color::Brown);
+                //we print † for the disease and the node position
+                nodeLabel = "\n\n†\n " + position->getNodeStringValue(n) + " ";
+            } else if (displayOption.getCurrent() < 2) { //if we choose to display all the nodes positions
+                nodeLabel = "\n\n " + position->getNodeStringValue(n) + " ";
+            } //otherwise, we don't display anything
+            result->setNodeValue(n,nodeLabel);
+        }
+    }
 
     return true;
   }

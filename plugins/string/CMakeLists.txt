@@ -1,7 +1,7 @@
 INCLUDE_DIRECTORIES(${TulipCoreInclude} ${TulipCoreBuildInclude})
 
 ##----------------------------------------------------------------------------------------------------------------------------
-ADD_LIBRARY(ToLabels-${TulipVersion} SHARED ToLabels.cpp)
+ADD_LIBRARY(ToLabels-${TulipVersion} SHARED tolabels.cpp)
 TARGET_LINK_LIBRARIES(ToLabels-${TulipVersion} ${LibTulipCoreName})
 
 ##----------------------------------------------------------------------------------------------------------------------------
