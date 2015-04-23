@@ -3287,3 +3287,6 @@
 /home/jules/SAMOGWAS/Tulip4.6/tulip-src/INSTALL.mac
 /home/jules/SAMOGWAS/Tulip4.6/tulip-src/newheader.sh
 /home/jules/SAMOGWAS/Tulip4.6/tulip-src/TulipUseFile.cmake
+plugins/layout/GenomeSorting.h
+plugins/layout/GenomeSorting.cpp
+plugins/string/SNPIdentified.cpp
