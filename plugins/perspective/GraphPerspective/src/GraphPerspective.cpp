@@ -55,6 +55,11 @@
 #include <tulip/PluginLister.h>
 #include <tulip/TlpQtTools.h>
 #include <tulip/TulipProject.h>
+#include <tulip/CSVParserConfigurationWidget.h>
+#include <tulip/CSVImportConfigurationWidget.h>
+#include <tulip/CSVGraphMappingConfigurationWidget.h>
+#include <tulip/CSVParser.h>
+#include <tulip/CSVGraphImport.h>
 
 #include "ui_GraphPerspectiveMainWindow.h"
 
@@ -410,6 +415,202 @@ void GraphPerspective::start(tlp::PluginProgress *progress) {
   buildRecentDocumentsMenu();
 
   showTrayMessage("GraphPerspective started");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  if (_graphs->size()==0) {
+    _graphs->addGraph(tlp::newGraph());
+  }
+
+  Graph* g = _graphs->currentGraph();
+
+
+
+  CSVImportWizard *wizard = new CSVImportWizard(_mainWindow);
+  wizard->setGraph(g);
+  bool processIsValid = createNodes(wizard);
+
+
+  if(processIsValid) {
+    //Call QDialog accept
+    wizard->accept();
+  }
+  else {
+    wizard->reject();
+  }
+/*  processIsValid = createEdges(wizard);
+
+
+  if(processIsValid) {
+    //Call QDialog accept
+    wizard->accept();
+  }
+  else {
+    wizard->reject();
+  }
+*/
+
+  Observable::holdObservers();
+  LayoutProperty* viewLayout = g->getProperty<LayoutProperty>("viewLayout");
+  Iterator<node>* it = viewLayout->getNonDefaultValuatedNodes();
+
+  if (!it->hasNext()) {
+    std::string str;
+    g->applyPropertyAlgorithm("Random layout", viewLayout, str);
+  }
+
+  delete it;
+
+  Observable::unholdObservers();
+
+bool openPanels = true;
+foreach(View* v, _ui->workspace->panels()) {
+  if (v->graph() == g) {
+    openPanels = false;
+    break;
+  }
+}
+
+if (openPanels)
+  showStartPanels(g);
+
+}
+
+bool GraphPerspective::createNodes(CSVImportWizard *wizard) {
+      Graph* g = _graphs->currentGraph();
+      bool processIsValid;
+
+    CSVParserConfigurationWidget *parserConfigurationWidget = new CSVParserConfigurationWidget(wizard);
+    parserConfigurationWidget->setFileToOpen("/home/jules/SAMOGWAS/Data/CsvRandomData/nodes.csv");
+    CSVParser* parser = parserConfigurationWidget->buildParser();
+
+    CSVImportConfigurationWidget *importConfigurationWidget =  new CSVImportConfigurationWidget(wizard);
+    importConfigurationWidget->setNewParser(parser);
+
+    CSVGraphMappingConfigurationWidget *graphConfigurationWidget =  new CSVGraphMappingConfigurationWidget(wizard);
+    graphConfigurationWidget->updateWidget(g,importConfigurationWidget->getImportParameters());
+
+
+    if(g != NULL) {
+
+
+      if(parser != NULL) {
+        processIsValid = true;
+        CSVImportParameters importParam = importConfigurationWidget->getImportParameters();
+        //Get row to graph element mapping
+        CSVToGraphDataMapping *rowMapping =graphConfigurationWidget->buildMappingObject();// new CSVToNewNodeIdMapping(g);
+        //Get column to graph properties mapping
+        CSVImportColumnToGraphPropertyMapping *columnMapping = new CSVImportColumnToGraphPropertyMappingProxy(g,importParam,wizard);
+
+        //Invalid mapping objects
+        if(rowMapping== NULL || columnMapping==NULL) {
+          processIsValid = false;
+        }
+
+        if(processIsValid) {
+          //Launch the import process
+          SimplePluginProgressDialog progress(wizard);
+          progress.showPreview(false);
+          progress.show();
+          //Build import object
+          CSVGraphImport csvToGraph(rowMapping,columnMapping,importParam);
+          progress.setWindowTitle("Importing data");
+          processIsValid = parser->parse(&csvToGraph,&progress);
+        }
+
+        //Release objects
+        delete rowMapping;
+        delete columnMapping;
+        delete parser;
+      }
+    }
+    return processIsValid;
+}
+
+
+
+bool GraphPerspective::createEdges(CSVImportWizard *wizard) {
+      Graph* g = _graphs->currentGraph();
+      bool processIsValid;
+
+    CSVParserConfigurationWidget *parserConfigurationWidget = new CSVParserConfigurationWidget(wizard);
+    parserConfigurationWidget->setFileToOpen("/home/jules/SAMOGWAS/Data/CsvRandomData/edges.csv");
+    CSVParser* parser = parserConfigurationWidget->buildParser();
+
+    CSVImportConfigurationWidget *importConfigurationWidget =  new CSVImportConfigurationWidget(wizard);
+    importConfigurationWidget->setNewParser(parser);
+
+    CSVGraphMappingConfigurationWidget *graphConfigurationWidget =  new CSVGraphMappingConfigurationWidget(wizard);
+    graphConfigurationWidget->updateWidget(g,importConfigurationWidget->getImportParameters());
+
+    CSVImportParameters importParameters = importConfigurationWidget->getImportParameters();
+
+    std::vector<unsigned int> edgeColumnIds;
+      int srcColumn = -1, tgtColumn = -1;
+    for(unsigned int i = 0 ; i< importParameters.columnNumber(); ++i) {
+      if (importParameters.importColumn(i)) {
+        if (srcColumn == -1) {
+          srcColumn = i;
+          edgeColumnIds.push_back(i);
+        }
+        else if (tgtColumn == -1) {
+          tgtColumn = i;
+        }
+      }
+    }
+
+
+    if(g != NULL) {
+
+
+      if(parser != NULL) {
+        processIsValid = true;
+        CSVImportParameters importParam = importConfigurationWidget->getImportParameters();
+        std::vector<std::string> propertyNames =  std::vector<std::string>();
+        propertyNames.push_back("id_node");
+        //Get row to graph element mapping
+        CSVToGraphDataMapping *rowMapping =new CSVToGraphEdgeIdMapping(g, edgeColumnIds, propertyNames);// new CSVToGraphEdgeIdMapping(g, importConfigurationWidget->getImportParameters(), );
+        //Get column to graph properties mapping
+        CSVImportColumnToGraphPropertyMapping *columnMapping = new CSVImportColumnToGraphPropertyMappingProxy(g,importParam,wizard);
+
+        //Invalid mapping objects
+        if(rowMapping== NULL || columnMapping==NULL) {
+          processIsValid = false;
+        }
+
+        if(processIsValid) {
+          //Launch the import process
+          SimplePluginProgressDialog progress(wizard);
+          progress.showPreview(false);
+          progress.show();
+          //Build import object
+          CSVGraphImport csvToGraph(rowMapping,columnMapping,importParam);
+          progress.setWindowTitle("Importing data");
+          processIsValid = parser->parse(&csvToGraph,&progress);
+        }
+
+        //Release objects
+        delete rowMapping;
+        delete columnMapping;
+        delete parser;
+      }
+    }
+    return processIsValid;
 }
 
 tlp::GraphHierarchiesModel* GraphPerspective::model() const {

@@ -23,6 +23,7 @@
 #include <QPoint>
 #include <tulip/Perspective.h>
 #include <tulip/Observable.h>
+#include <tulip/CSVImportWizard.h>
 
 class QAction;
 class QHeaderView;
@@ -71,6 +72,8 @@ public:
   GraphPerspective(const tlp::PluginContext* c);
   virtual ~GraphPerspective();
   virtual void start(tlp::PluginProgress *);
+  bool createNodes(tlp::CSVImportWizard *wizard);
+  bool createEdges(tlp::CSVImportWizard *wizard);
   tlp::GraphHierarchiesModel* model() const;
   void copy(tlp::Graph*, bool deleteAfter=false);
   tlp::Graph* createSubGraph(tlp::Graph*);
