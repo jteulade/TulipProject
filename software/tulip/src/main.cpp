@@ -177,22 +177,17 @@ int main(int argc, char **argv) {
   delete dispatcher;
   delete splashScreen;
 
-//  QVariantMap *a = new QVariantMap();
-
-//  TulipPerspectiveProcessHandler::instance()->createPerspective("Tulip","",*a);
-
-
   // Main window
   TulipMainWindow *mainWindow = TulipMainWindow::instance();
   mainWindow->pluginsCenter()->reportPluginErrors(errorReport->errors());
   delete errorReport;
 
   //uncomment to display the main tulip window
-  //mainWindow->show();
+  mainWindow->show();
 
   //display the specific perspective at the beginning
-  std::string stdName = *(tlp::PluginLister::instance()->availablePlugins<tlp::Perspective>().begin());
-  perspName = stdName.c_str();
+  //std::string stdName = *(tlp::PluginLister::instance()->availablePlugins<tlp::Perspective>().begin());
+  //perspName = stdName.c_str();
 
   // Treat arguments
   if (!fileToOpen.isNull()) { // open the file passed as argument
