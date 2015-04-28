@@ -22,15 +22,15 @@
 #include "TreeTools.h"
 #include "Orientation.h"
 #include "DatasetTools.h"
-#include "MyPlugin.h"
+#include "GenomeSorting.h"
 using namespace std;
 using namespace tlp;
 
 
-PLUGIN(MyPlugin)
+PLUGIN(GenomeSorting)
 
 //====================================================================
-MyPlugin::MyPlugin(const tlp::PluginContext* context)
+GenomeSorting::GenomeSorting(const tlp::PluginContext* context)
 :LayoutAlgorithm(context) {
   addNodeSizePropertyParameter(this);
   addOrientationParameters(this);
@@ -38,10 +38,10 @@ MyPlugin::MyPlugin(const tlp::PluginContext* context)
 }
 
 //====================================================================
-MyPlugin::~MyPlugin() {
+GenomeSorting::~GenomeSorting() {
 }
 //====================================================================
-void MyPlugin::computeLevelHeights(tlp::Graph *tree, tlp::node n, unsigned int depth,
+void GenomeSorting::computeLevelHeights(tlp::Graph *tree, tlp::node n, unsigned int depth,
                                      OrientableSizeProxy *oriSize) {
   if (levelHeights.size() == depth)
     levelHeights.push_back(0);
@@ -56,7 +56,7 @@ void MyPlugin::computeLevelHeights(tlp::Graph *tree, tlp::node n, unsigned int d
     computeLevelHeights(tree, on, depth + 1, oriSize);
 }
 //====================================================================
-bool MyPlugin::run() {
+bool GenomeSorting::run() {
   orientationType mask = getMask(dataSet);
   OrientableLayout *oriLayout = new OrientableLayout(result, mask);
   SizeProperty* size;
@@ -64,6 +64,9 @@ bool MyPlugin::run() {
   if (!getNodeSizePropertyParameter(dataSet, size))
     size = graph->getProperty<SizeProperty>("viewSize");
 
+  //allow to modify the nodes color and size
+  ColorProperty *viewColor = graph->getProperty<ColorProperty>("viewColor");
+  SizeProperty *viewSize = graph->getProperty<SizeProperty>("viewSize");
 
   OrientableSizeProxy oriSize(size, mask);
   getSpacingParameters(dataSet, nodeSpacing, spacing);
@@ -77,6 +80,14 @@ bool MyPlugin::run() {
 
   if (result->getName() != "")
     propsToPreserve.push_back(result);
+
+  //preserve the changes of nodes color
+  if (viewColor->getName() != "")
+    propsToPreserve.push_back(viewColor);
+
+  //preserve the changes of nodes size
+  if (viewSize->getName() != "")
+    propsToPreserve.push_back(viewSize);
 
   graph->push(false, &propsToPreserve);
 
@@ -101,6 +112,11 @@ bool MyPlugin::run() {
 
   setAllNodesCoordXY(oriLayout);
 
+  //adjust the edge size according to the source node and the target node
+  edge e;
+  forEach(e,tree->getEdges())
+      viewSize->setEdgeValue(e, getEdgeValue(e));
+
   // forget last temporary graph state
   graph->pop();
 
@@ -109,7 +125,7 @@ bool MyPlugin::run() {
 }
 
 //====================================================================
-void MyPlugin::setAllNodesCoordXY(OrientableLayout *oriLayout) {
+void GenomeSorting::setAllNodesCoordXY(OrientableLayout *oriLayout) {
 
     //Return the variable position on the genome
     IntegerProperty *position = tree->getProperty<IntegerProperty>("position");
@@ -118,6 +134,18 @@ void MyPlugin::setAllNodesCoordXY(OrientableLayout *oriLayout) {
     IntegerProperty *level = tree->getProperty<IntegerProperty>("level");
 
     Iterator<node> *itNode =  tree->getNodes();
+
+    SizeProperty *viewSize = tree->getProperty<SizeProperty>("viewSize");
+
+    ColorProperty *viewColor = tree->getProperty<ColorProperty>("viewColor");
+    //adapt the colors according to the nodes level
+    std::vector<Color> levelColor;
+    levelColor.push_back(Color::Blue);
+    levelColor.push_back(Color::Red);
+    levelColor.push_back(Color::Green);
+    levelColor.push_back(Color::Yellow);
+    levelColor.push_back(Color::Magenta);
+    levelColor.push_back(Color::Azure);
 
     while (itNode->hasNext()) {
         node currentNode   = itNode->next();
@@ -132,6 +160,14 @@ void MyPlugin::setAllNodesCoordXY(OrientableLayout *oriLayout) {
         float coordZ    =   coord.getZ();
 
         setNodePosition(currentNode, newX, newY, coordZ, oriLayout);
+
+        //we modify the current node color according to its level
+        viewColor->setNodeValue(currentNode, levelColor[level->getNodeValue(currentNode)]);
+
+        //we choose the nodes size according to its level.
+        //the values have been chosen arbitrarily
+        int levelSize = (level->getNodeValue(currentNode) + 0.1) * 10;
+        viewSize->setNodeValue(currentNode,  Size(levelSize,levelSize,levelSize));
     }
     delete itNode;
 }
@@ -140,8 +176,18 @@ void MyPlugin::setAllNodesCoordXY(OrientableLayout *oriLayout) {
 
 
 //====================================================================
-inline void MyPlugin::setNodePosition(tlp::node n, float x, float y,
+inline void GenomeSorting::setNodePosition(tlp::node n, float x, float y,
                                         float z, OrientableLayout *oriLayout) {
   OrientableCoord coord = oriLayout->createCoord(x, y, z);
   oriLayout->setNodeValue(n, coord);
+}
+
+Size GenomeSorting::getEdgeValue(const edge e) {
+  Size s = result->getNodeValue(tree->source(e));
+  Size t = result->getNodeValue(tree->target(e));
+  Coord tmp(s.getW(),s.getH(),s.getD());
+  Coord tmp2(t.getW(),t.getH(),t.getD());
+  float sizes=tmp.norm();
+  float sizet=tmp2.norm();
+  return (Size(sizes/16,sizet/16,sizet/4));
 }
