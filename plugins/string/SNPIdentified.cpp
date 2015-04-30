@@ -29,7 +29,7 @@ const char * paramHelp[] = {
     HTML_HELP_DEF( "type", "String Collection" ) \
       HTML_HELP_DEF( "default", "ALL" )   \
     HTML_HELP_BODY() \
-    "Allow to display only a specific level" \
+    "Display only a specific level" \
     HTML_HELP_CLOSE(),
 
     //options
@@ -37,7 +37,7 @@ const char * paramHelp[] = {
     HTML_HELP_DEF( "type", "String Collection" ) \
       HTML_HELP_DEF( "default", "ALL" )   \
     HTML_HELP_BODY() \
-    "Allow to choose the option to display" \
+    "Choose the option to display" \
     HTML_HELP_CLOSE(),
 
     //approximation
@@ -45,19 +45,19 @@ const char * paramHelp[] = {
     HTML_HELP_DEF( "type", "String Collection" ) \
       HTML_HELP_DEF( "default", "1" )   \
     HTML_HELP_BODY() \
-    "Allow to render an approximation of the positions" \
+    "Render an approximation of the positions" \
     HTML_HELP_CLOSE()
 };
 }
 
-//allow to display only a specific variable level
+//Display only a specific variable level
 #define LEVEL_DISPLAY "ALL;SNP;VL1;VL2;VL3;VL4;VL5;VL6"
 #define INFORMATIONS "ALL;POSITIONS;DISEASES"
 #define APPROXIMATIONS "1;10^3;10^6"
-class SNPIdentified: public tlp::StringAlgorithm {
+class SNPIdentified: public Algorithm  {
 public:
   PLUGININFORMATION("SNP identified","Jules Teulade-Denantes","2012/03/16","Identify SNPs related to a disease","1.0","")
-  SNPIdentified(const tlp::PluginContext* context): StringAlgorithm(context) {  
+  SNPIdentified(const tlp::PluginContext* context): Algorithm(context)  {
     addInParameter<StringCollection>("levelSelection", paramHelp[0], LEVEL_DISPLAY);
     addInParameter<StringCollection>("displayOption", paramHelp[1], INFORMATIONS);
     addInParameter<StringCollection>("positionApproximation", paramHelp[2], APPROXIMATIONS);
@@ -80,6 +80,7 @@ public:
     // Sets different shapes and colors for each layer of the tree
     IntegerProperty *viewShape = graph->getProperty<IntegerProperty>("viewShape");
     ColorProperty *viewColor = graph->getProperty<ColorProperty>("viewColor");
+    StringProperty *viewLabel = graph->getProperty<StringProperty>("viewLabel");
 
     pluginProgress->setComment("Copying nodes values");
     node n;
@@ -100,7 +101,7 @@ public:
             } else if (displayOption.getCurrent() < 2) { //if we choose to display all the nodes positions
                 nodeLabel = "\n\n " + truncatedPosition + " ";
             } //otherwise, we don't display anything
-            result->setNodeValue(n,nodeLabel);
+            viewLabel->setNodeValue(n,nodeLabel);
         }
     }
 
