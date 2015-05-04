@@ -43,9 +43,9 @@ const char * paramHelp[] = {
     //approximation
     HTML_HELP_OPEN() \
     HTML_HELP_DEF( "type", "String Collection" ) \
-      HTML_HELP_DEF( "default", "1" )   \
+      HTML_HELP_DEF( "default", "bp" )   \
     HTML_HELP_BODY() \
-    "Render an approximation of the positions" \
+    "Choose the unit of measure to display" \
     HTML_HELP_CLOSE()
 };
 }
@@ -53,14 +53,14 @@ const char * paramHelp[] = {
 //Display only a specific variable level
 #define LEVEL_DISPLAY "ALL;SNP;VL1;VL2;VL3;VL4;VL5;VL6"
 #define INFORMATIONS "ALL;POSITIONS;DISEASES"
-#define APPROXIMATIONS "1;10^3;10^6"
+#define APPROXIMATIONS "bp;kbp;Mbp"
 class SNPIdentified: public Algorithm  {
 public:
   PLUGININFORMATION("SNP identified","Jules Teulade-Denantes","2012/03/16","Identify SNPs related to a disease","1.0","")
   SNPIdentified(const tlp::PluginContext* context): Algorithm(context)  {
-    addInParameter<StringCollection>("levelSelection", paramHelp[0], LEVEL_DISPLAY);
-    addInParameter<StringCollection>("displayOption", paramHelp[1], INFORMATIONS);
-    addInParameter<StringCollection>("positionApproximation", paramHelp[2], APPROXIMATIONS);
+    addInParameter<StringCollection>("Display level", paramHelp[0], LEVEL_DISPLAY);
+    addInParameter<StringCollection>("Display information", paramHelp[1], INFORMATIONS);
+    addInParameter<StringCollection>("Unit of measure", paramHelp[2], APPROXIMATIONS);
   }
 
   bool run() {
@@ -70,9 +70,9 @@ public:
     levelSelection.setCurrent(0);
 
     if (dataSet != NULL) {
-      dataSet->get("levelSelection",levelSelection);
-      dataSet->get("displayOption",displayOption);
-      dataSet->get("positionApproximation",positionApproximation);
+      dataSet->get("Display level",levelSelection);
+      dataSet->get("Display information",displayOption);
+      dataSet->get("Unit of measure",positionApproximation);
     }
     IntegerProperty *level = graph->getProperty<IntegerProperty>("level");
     IntegerProperty *position = graph->getProperty<IntegerProperty>("position");
