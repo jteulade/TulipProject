@@ -33,6 +33,7 @@ class QGraphicsProxyWidget;
 class QTableView;
 class QAbstractItemModel;
 class QObject;
+class QString;
 
 namespace tlp {
 
@@ -62,7 +63,6 @@ protected:
   ViewWidget *_view;
   QWidget *_informationsWidget;
   QGraphicsProxyWidget *_informationsWidgetItem;
-  Graph *_specificGraph;
 
   QTableView* tableView() const;
 
@@ -83,7 +83,8 @@ protected:
   virtual QString elementName(ElementType elementType, unsigned int elementId)const;
 
 
-  virtual void constructSpecificGraph();
+  //return true if the property has to be hidden
+  bool hiddenProperty(QString property);
 };
 
 }
