@@ -54,10 +54,10 @@ const char * paramHelp[] = {
 #define LEVEL_DISPLAY "ALL;SNP;VL1;VL2;VL3;VL4;VL5;VL6"
 #define INFORMATIONS "ALL;POSITIONS;DISEASES"
 #define APPROXIMATIONS "bp;kbp;Mbp"
-class SNPIdentified: public Algorithm  {
+class SNPIdentified: public StringAlgorithm  {
 public:
   PLUGININFORMATION("SNP identified","Jules Teulade-Denantes","2012/03/16","Identify SNPs related to a disease","1.0","")
-  SNPIdentified(const tlp::PluginContext* context): Algorithm(context)  {
+  SNPIdentified(const tlp::PluginContext* context): StringAlgorithm(context)  {
     addInParameter<StringCollection>("Display level", paramHelp[0], LEVEL_DISPLAY);
     addInParameter<StringCollection>("Display information", paramHelp[1], INFORMATIONS);
     addInParameter<StringCollection>("Unit of measure", paramHelp[2], APPROXIMATIONS);
@@ -67,7 +67,6 @@ public:
     StringCollection levelSelection(LEVEL_DISPLAY);
     StringCollection displayOption(INFORMATIONS);
     StringCollection positionApproximation(APPROXIMATIONS);
-    levelSelection.setCurrent(0);
 
     if (dataSet != NULL) {
       dataSet->get("Display level",levelSelection);
@@ -80,16 +79,18 @@ public:
     // Sets different shapes and colors for each layer of the tree
     IntegerProperty *viewShape = graph->getProperty<IntegerProperty>("viewShape");
     ColorProperty *viewColor = graph->getProperty<ColorProperty>("viewColor");
-    StringProperty *viewLabel = graph->getProperty<StringProperty>("viewLabel");
 
     pluginProgress->setComment("Copying nodes values");
+    int step=0,max_step = graph->numberOfNodes();
     node n;
-
     forEach(n, graph->getNodes()) {
         //all the levels or a specific level
         if (levelSelection.getCurrentString() == "ALL" || levelSelection.getCurrent() - 1 == level->getNodeValue(n)) {
+            pluginProgress->progress(step++,max_step);
+            //truncatedIndex indicates how many decimals we have to truncate
+            int truncatedIndex = position->getNodeStringValue(n).size() - positionApproximation.getCurrent() * 3;
             //truncatedPosition truncates the label node related to the position approximation chosen
-            std::string truncatedPosition = position->getNodeStringValue(n).substr(0,position->getNodeStringValue(n).size() - positionApproximation.getCurrent() * 3);
+            std::string truncatedPosition = (truncatedIndex >0) ? position->getNodeStringValue(n).substr(0, truncatedIndex) : "0";
             std::string nodeLabel = "";
             //if we choose to display diseases  && condition on a node (pvalue for example)
             if (displayOption.getCurrent()%2 == 0 && position->getNodeValue(n)%20 == 0) {
@@ -101,7 +102,7 @@ public:
             } else if (displayOption.getCurrent() < 2) { //if we choose to display all the nodes positions
                 nodeLabel = "\n\n " + truncatedPosition + " ";
             } //otherwise, we don't display anything
-            viewLabel->setNodeValue(n,nodeLabel);
+            result->setNodeValue(n,nodeLabel);
         }
     }
 
