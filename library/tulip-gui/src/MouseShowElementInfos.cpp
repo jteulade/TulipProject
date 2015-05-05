@@ -173,5 +173,5 @@ QString MouseShowElementInfos::elementName(ElementType elementType, unsigned int
 }
 
 bool MouseShowElementInfos::hiddenProperty(QString property) {
-    return (property.contains("id") || property.contains("view"));
+    return property.contains("view");
 }
