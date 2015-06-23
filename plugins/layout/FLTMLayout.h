@@ -16,8 +16,8 @@
  * See the GNU General Public License for more details.
  *
  */
-#ifndef GENOMESORTING_H
-#define GENOMESORTING_H
+#ifndef FLTMLAYOUT_H
+#define FLTMLAYOUT_H
 
 #include <map>
 #include <vector>
@@ -29,7 +29,7 @@ class OrientableSizeProxy;
 
 /** \addtogroup layout */
 
-/** This plugin is an implementation of a GenomeSorting, an extended implementation
+/** This plugin is an implementation of a FLTMLayout, an extended implementation
  *  of a "Bio representation" which includes variable orientation
  *  and variable node sizelayout.
  *
@@ -39,13 +39,13 @@ class OrientableSizeProxy;
  *  \author Jules Teulade-Denantes
  *  University Nantes France
  **/
-class GenomeSorting: public tlp::LayoutAlgorithm {
+class FLTMLayout: public tlp::LayoutAlgorithm {
  public:
-  PLUGININFORMATION("GenomeSorting",
+  PLUGININFORMATION("FLTM layout",
                     "Jules Teulade-Denantes",
                     "03/12/04", "ok", "1.0","Tree")
-    GenomeSorting(const tlp::PluginContext* context);
-  ~GenomeSorting();
+    FLTMLayout(const tlp::PluginContext* context);
+  ~FLTMLayout();
 
   bool run();
 

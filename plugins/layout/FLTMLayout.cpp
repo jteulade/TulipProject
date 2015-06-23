@@ -22,15 +22,15 @@
 #include "TreeTools.h"
 #include "Orientation.h"
 #include "DatasetTools.h"
-#include "GenomeSorting.h"
+#include "FLTMLayout.h"
 using namespace std;
 using namespace tlp;
 
 
-PLUGIN(GenomeSorting)
+PLUGIN(FLTMLayout)
 
 //====================================================================
-GenomeSorting::GenomeSorting(const tlp::PluginContext* context)
+FLTMLayout::FLTMLayout(const tlp::PluginContext* context)
 :LayoutAlgorithm(context) {
   addNodeSizePropertyParameter(this);
   addOrientationParameters(this);
@@ -38,10 +38,10 @@ GenomeSorting::GenomeSorting(const tlp::PluginContext* context)
 }
 
 //====================================================================
-GenomeSorting::~GenomeSorting() {
+FLTMLayout::~FLTMLayout() {
 }
 //====================================================================
-void GenomeSorting::computeLevelHeights(tlp::Graph *tree, tlp::node n, unsigned int depth,
+void FLTMLayout::computeLevelHeights(tlp::Graph *tree, tlp::node n, unsigned int depth,
                                      OrientableSizeProxy *oriSize) {
   if (levelHeights.size() == depth)
     levelHeights.push_back(0);
@@ -56,19 +56,18 @@ void GenomeSorting::computeLevelHeights(tlp::Graph *tree, tlp::node n, unsigned 
     computeLevelHeights(tree, on, depth + 1, oriSize);
 }
 //====================================================================
-bool GenomeSorting::run() {
+bool FLTMLayout::run() {
+    //dataSet->set("edgeColorInterpolation", true);
+
   orientationType mask = getMask(dataSet);
   OrientableLayout *oriLayout = new OrientableLayout(result, mask);
-  SizeProperty* size;
-
-  if (!getNodeSizePropertyParameter(dataSet, size))
-    size = graph->getProperty<SizeProperty>("viewSize");
 
   //allow to modify the nodes color and size
   ColorProperty *viewColor = graph->getProperty<ColorProperty>("viewColor");
   SizeProperty *viewSize = graph->getProperty<SizeProperty>("viewSize");
+ // BooleanProperty *edgeColor = graph->getProperty<BooleanProperty>("edgeColorInterpolation");
 
-  OrientableSizeProxy oriSize(size, mask);
+  OrientableSizeProxy oriSize(viewSize, mask);
   getSpacingParameters(dataSet, nodeSpacing, spacing);
 
   if (pluginProgress)
@@ -98,17 +97,17 @@ bool GenomeSorting::run() {
     return false;
   }
 
-  root = tree->getSource();
-  computeLevelHeights(tree, root, 0, &oriSize);
+//  root = tree->getSource();
+//  computeLevelHeights(tree, root, 0, &oriSize);
 
-  // check if the specified layer spacing is greater
-  // than the max of the minimum layer spacing of the tree
-  for (unsigned int i = 0; i < levelHeights.size() - 1;  ++i) {
-    float minLayerSpacing = (levelHeights[i] + levelHeights[i + 1]) / 2;
+//  // check if the specified layer spacing is greater
+//  // than the max of the minimum layer spacing of the tree
+//  for (unsigned int i = 0; i < levelHeights.size() - 1;  ++i) {
+//    float minLayerSpacing = (levelHeights[i] + levelHeights[i + 1]) / 2;
 
-    if (minLayerSpacing + nodeSpacing > spacing)
-      spacing = minLayerSpacing + nodeSpacing;
-  }
+//    if (minLayerSpacing + nodeSpacing > spacing)
+//      spacing = minLayerSpacing + nodeSpacing;
+//  }
 
   setAllNodesCoordXY(oriLayout);
 
@@ -117,15 +116,19 @@ bool GenomeSorting::run() {
   forEach(e,tree->getEdges())
       viewSize->setEdgeValue(e, getEdgeValue(e));
 
+//  GlMainView::getGlMainWidget()->getScene()->getGlGraphComposite()->getRenderingParameters().setEdgeColorInterpolate(true);
+
+  //edgeColor->setAllEdgeValue(true);
   // forget last temporary graph state
   graph->pop();
 
   delete oriLayout;
   return true;
+
 }
 
 //====================================================================
-void GenomeSorting::setAllNodesCoordXY(OrientableLayout *oriLayout) {
+void FLTMLayout::setAllNodesCoordXY(OrientableLayout *oriLayout) {
 
     //Return the variable position on the genome
     IntegerProperty *position = tree->getProperty<IntegerProperty>("position");
@@ -176,13 +179,13 @@ void GenomeSorting::setAllNodesCoordXY(OrientableLayout *oriLayout) {
 
 
 //====================================================================
-inline void GenomeSorting::setNodePosition(tlp::node n, float x, float y,
+inline void FLTMLayout::setNodePosition(tlp::node n, float x, float y,
                                         float z, OrientableLayout *oriLayout) {
   OrientableCoord coord = oriLayout->createCoord(x, y, z);
   oriLayout->setNodeValue(n, coord);
 }
 
-Size GenomeSorting::getEdgeValue(const edge e) {
+Size FLTMLayout::getEdgeValue(const edge e) {
   Size s = result->getNodeValue(tree->source(e));
   Size t = result->getNodeValue(tree->target(e));
   Coord tmp(s.getW(),s.getH(),s.getD());

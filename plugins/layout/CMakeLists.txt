@@ -87,8 +87,8 @@ ADD_LIBRARY(Dendrogram-${TulipVersion} SHARED Dendrogram.cpp)
 TARGET_LINK_LIBRARIES(Dendrogram-${TulipVersion} ${LayoutUtilsLibraryName} ${LibTulipCoreName})
 
 ##----------------------------------------------------------------------------------------------------------------------------
-ADD_LIBRARY(GenomeSorting-${TulipVersion} SHARED GenomeSorting.cpp)
-TARGET_LINK_LIBRARIES(GenomeSorting-${TulipVersion} ${LayoutUtilsLibraryName} ${LibTulipCoreName})
+ADD_LIBRARY(FLTMLayout-${TulipVersion} SHARED FLTMLayout.cpp)
+TARGET_LINK_LIBRARIES(FLTMLayout-${TulipVersion} ${LayoutUtilsLibraryName} ${LibTulipCoreName})
 
 ##----------------------------------------------------------------------------------------------------------------------------
 ADD_LIBRARY(ImprovedWalker-${TulipVersion} SHARED ImprovedWalker.cpp)
@@ -123,7 +123,7 @@ INSTALL(TARGETS Circular-${TulipVersion} DESTINATION ${TulipPluginsInstallDir} C
 INSTALL(TARGETS HierarchicalGraph-${TulipVersion} DESTINATION ${TulipPluginsInstallDir} COMPONENT HierarchicalGraph)
 INSTALL(TARGETS Tutte-${TulipVersion} DESTINATION ${TulipPluginsInstallDir} COMPONENT Tutte)
 INSTALL(TARGETS Dendrogram-${TulipVersion} DESTINATION ${TulipPluginsInstallDir} COMPONENT Dendrogram)
-INSTALL(TARGETS GenomeSorting-${TulipVersion} DESTINATION ${TulipPluginsInstallDir} COMPONENT GenomeSorting)
+INSTALL(TARGETS FLTMLayout-${TulipVersion} DESTINATION ${TulipPluginsInstallDir} COMPONENT FLTMLayout)
 INSTALL(TARGETS ImprovedWalker-${TulipVersion} DESTINATION ${TulipPluginsInstallDir} COMPONENT ImprovedWalker)
 INSTALL(TARGETS SquarifiedTreeMap-${TulipVersion} DESTINATION ${TulipPluginsInstallDir} COMPONENT SquarifiedTreeMap)
 INSTALL(TARGETS PerfectLayout-${TulipVersion} DESTINATION ${TulipPluginsInstallDir} COMPONENT PerfectLayout)
